@@ -65,9 +65,9 @@ class AuthController extends APIController
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'                  => 'required|string|max:255',
-            'email'                 => 'required|string|email|max:255|unique:users',
-            'password'              => 'required|string|min:6|confirmed',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
         if ($validator->fails()) {
@@ -75,8 +75,8 @@ class AuthController extends APIController
         }
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
+            'name' => $request->name,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
@@ -114,12 +114,16 @@ class AuthController extends APIController
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Login successful"),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...")
-     *             )
+     *     @OA\Property(
+     *                 property="data", type="object",
+     *                 @OA\Property(property="user", type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="John Doe"),
+     *                     @OA\Property(property="email", type="string", example="john@example.com")
+     *                 ),
      *         )
      *     ),
-     *     @OA\Response(
+     * @OA\Response(
      *         response=401,
      *         description="Unauthorized",
      *         @OA\JsonContent(
@@ -133,11 +137,14 @@ class AuthController extends APIController
     {
         $credentials = $request->only('email', 'password');
 
-        if (! $token = JWTAuth::attempt($credentials)) {
+        if (!$token = JWTAuth::attempt($credentials)) {
             return $this->errorResponse('Unauthorized', 401);
         }
 
-        return $this->successResponse(['token' => $token], 'Login successful');
+        return $this->successResponse([
+            'token' => $token,
+            'user' => Auth::user()
+        ], 'Login successful');
     }
 
     /**
@@ -216,7 +223,7 @@ class AuthController extends APIController
      *                 @OA\Property(property="name", type="string", example="Ali Rezaei"),
      *                 @OA\Property(property="email", type="string", example="ali@example.com"),
      *                 @OA\Property(property="phone", type="string", example="09121234567"),
-     *                 @OA\Property(property="avatar", type="file")
+     *                 @OA\Property(property="image", type="file")
      *             )
      *         )
      *     ),
@@ -240,12 +247,13 @@ class AuthController extends APIController
      */
     public function profile(Request $request)
     {
+
         try {
             $validated = Validator::make($request->all(), [
                 'name' => 'required|string',
                 'email' => 'required|string|email',
                 'phone' => 'required|string',
-                'image'=> 'file|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
 
             if ($validated->fails()) {
@@ -253,17 +261,17 @@ class AuthController extends APIController
             }
 
             $data = $validated->validated();
-
+            $image = null;
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
-                $data['avatar'] = $image->store('images/users', 'public');
+                $image = $image->store('images/users', 'public');
             }
 
             User::query()->where('id', auth()->id())->update([
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'phone' => $data['phone'],
-                'avatar' => $data['avatar']
+                'avatar' => $image
             ]);
 
             return $this->successResponse(null, 'Profile updated');

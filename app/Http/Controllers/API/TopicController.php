@@ -28,7 +28,7 @@ class TopicController extends APIController
      */
     public function index()
     {
-        return $this->successResponse(Topic::query()->latest()->paginate(3));
+        return $this->successResponse(Topic::query()->latest()->paginate(10));
     }
 
     /**

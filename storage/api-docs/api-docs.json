@@ -545,6 +545,23 @@
                                         },
                                         "data": {
                                             "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "John Doe"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "john@example.com"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
                                                 "token": {
                                                     "type": "string",
                                                     "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
