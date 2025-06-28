@@ -10,7 +10,7 @@
             "mountTo": "storage"
         },
         {
-            "name": "my-disck",
+            "name": "public",
             "mountTo": "public"
         }
     ]
