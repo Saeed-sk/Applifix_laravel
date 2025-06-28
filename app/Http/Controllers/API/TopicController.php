@@ -88,7 +88,7 @@ class TopicController extends APIController
     }
 
     /**
-     * @OA\Put(
+     * @OA\Post(
      *     path="/api/topics/{id}",
      *     summary="Update an existing topic",
      *     tags={"topics"},
@@ -132,7 +132,7 @@ class TopicController extends APIController
      * )
      */
 
-    public function update(Request $request, $id)
+    public function update(Request $request,$id)
     {
         // Find the topic or return 404
         $topic = Topic::findOrFail($id);
@@ -140,7 +140,7 @@ class TopicController extends APIController
         // Validate incoming request; image is optional on update
         $validated = Validator::make($request->all(), [
             'title'       => 'required|string|max:255',
-            'description' => 'required|string|max:255',
+            'description' => 'required|string|max:65000',
             'image'       => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 

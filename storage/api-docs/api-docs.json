@@ -499,7 +499,6 @@
                     "Auth"
                 ],
                 "summary": "Authenticate user and issue token",
-                "description": "Authenticate user and issue token",
                 "operationId": "44212a9096e4b09358281e9ec8a0701d",
                 "requestBody": {
                     "description": "User login credentials",
@@ -564,7 +563,7 @@
                                                 },
                                                 "token": {
                                                     "type": "string",
-                                                    "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                                    "example": "jwt-token-here"
                                                 }
                                             },
                                             "type": "object"
@@ -717,7 +716,7 @@
                                         "type": "string",
                                         "example": "09121234567"
                                     },
-                                    "avatar": {
+                                    "image": {
                                         "type": "file"
                                     }
                                 },
@@ -962,13 +961,13 @@
                 ]
             }
         },
-        "/api/chat/topic": {
+        "/api/new/chat/topic": {
             "post": {
                 "tags": [
                     "chat"
                 ],
                 "summary": "Create chat using topic description",
-                "operationId": "ee77bd48b33bef6900b6998ed312eead",
+                "operationId": "1f07001b8d8671634af11e3321733a5a",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1520,12 +1519,12 @@
             }
         },
         "/api/topics/{id}": {
-            "put": {
+            "post": {
                 "tags": [
                     "topics"
                 ],
                 "summary": "Update an existing topic",
-                "operationId": "14e3f337c6ebae086ff7938eb17e5ebe",
+                "operationId": "7741198b46efbd1648c920c47d7a1d94",
                 "parameters": [
                     {
                         "name": "id",

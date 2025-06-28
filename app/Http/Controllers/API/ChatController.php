@@ -19,6 +19,7 @@ use OpenApi\Annotations as OA;
 class ChatController extends APIController
 {
     protected string $openApiUrl = 'https://api.openai.com/v1/chat/completions';
+
     /**
      * @OA\Get(
      *     path="/api/chat",
@@ -43,7 +44,7 @@ class ChatController extends APIController
 
     /**
      * @OA\Post(
-     *     path="/api/chat/topic",
+     *     path="/api/new/chat/topic",
      *     summary="Create chat using topic description",
      *     tags={"chat"},
      *     security={{"bearerAuth":{}}},
@@ -67,7 +68,7 @@ class ChatController extends APIController
     {
         $topic_id = $request->input('topic_id');
         $topic = Topic::query()->firstWhere('id', $topic_id);
-        return $this->create($request->merge(['message'=>$topic->description, 'topic_id'=>$topic_id]));
+        return $this->create($request->merge(['message' => $topic->description, 'topic_id' => $topic_id]));
     }
 
     /**
@@ -114,21 +115,28 @@ class ChatController extends APIController
         $client = new Client();
         $apikey = config('services.openai.api_key');
         $message = $request->input('message');
-        $chat_id = $request->input('chat_id' , null);
-        $topic_id = $request->input('topic_id' , null);
+        $chat_id = $request->input('chat_id', null);
+        $topic_id = $request->input('topic_id', null);
 
         try {
             $response = $client->post($this->openApiUrl, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' .$apikey,
-                    'Content-Type'  => 'application/json',
+                    'Authorization' => 'Bearer ' . $apikey,
+                    'Content-Type' => 'application/json',
                 ],
                 'json' => [
                     'model' => 'gpt-3.5-turbo',
                     'messages' => [
                         [
                             'role' => 'system',
-                            'content' => 'You are an expert assistant specialized in diagnosing, troubleshooting, and repairing **all types of household and electronic appliances**, including but not limited to TVs, mobile phones, refrigerators, washing machines, vacuum cleaners, microwaves, air conditioners, and other electrical/electronic home devices. You must provide only repair-related answers. If the user asks anything outside the field of appliance or electronics repair, politely respond: "I can only assist with issues related to repair of electronic and electrical appliances.'
+                            'content' => 'You are a highly experienced and specialized assistant in diagnosing, troubleshooting, and repairing all kinds of electrical and electronic appliances and devices. This includes, but is not limited to: refrigerators, washing machines, air conditioners, vacuum cleaners, microwave ovens, TVs, mobile phones, laptops, computers, circuit boards, power supplies, and all types of household or personal electrical/electronic equipment.
+
+                            Your job is to provide clear, detailed, and practical advice on repairing, maintaining, and diagnosing problems in these devices. You must guide users step-by-step in identifying issues and suggest effective solutions that can be safely done by users at home or by a technician.
+
+                            ⚠️ Important: Only respond to questions related to the repair, maintenance, or troubleshooting of electrical and electronic appliances and devices. If a user asks something outside this field, kindly reply:
+                            "I\'m here to assist only with repair, maintenance, and troubleshooting of electrical and electronic appliances and devices."
+
+                            Make sure your answers are simple, easy to understand, and actionable, even for people without technical knowledge.'
                         ],
                         [
                             'role' => 'user',
@@ -146,15 +154,26 @@ class ChatController extends APIController
                     $title = '';
                     if ($topic_id !== null) {
                         $title = Topic::query()->find($topic_id)->title;
-                    }else{
+                    } else {
                         $title = $message;
                     }
-                    $chat_id = $this->storeChat($topic_id , $user_id, $title);
+                    $chat_id = $this->storeChat($topic_id, $user_id, $title);
                 }
                 $this->storeHistory($chat_id, $user_id, $message, 'user');
                 $this->storeHistory($chat_id, $user_id, $body['choices'][0]['message']['content'] ?? 'No response received.', 'assistant');
+            } else if ($response->getStatusCode() === 200 && !Auth::check() && $topic_id !== null) {
+                return $this->successResponse([
+                    [
+                        'role' => 'user',
+                        'message' => $message,
+                        'created_at' => now()
+                    ], [
+                        'role' => 'assistant',
+                        'message' => $body['choices'][0]['message']['content'],
+                        'created_at' => now()
+                    ]
+                ]);
             }
-
             return $this->successResponse([
                 'ai_message' => $body['choices'][0]['message']['content'],
                 'chat_id' => $chat_id
@@ -174,7 +193,7 @@ class ChatController extends APIController
         }
     }
 
-    private function storeChat($topic_id , $user_id, $title)
+    private function storeChat($topic_id, $user_id, $title)
     {
         $chat = Chat::query()->create([
             'title' => $title,
@@ -184,6 +203,7 @@ class ChatController extends APIController
 
         return $chat->id;
     }
+
     private function storeHistory($chat_id, $user_id, $message, $role)
     {
         ChatHistory::query()->create([
@@ -192,8 +212,9 @@ class ChatController extends APIController
             'message' => $message,
             'role' => $role
         ]);
-        return ;
+        return;
     }
+
     /**
      * @OA\Get(
      *     path="/api/chat/{chat}",
@@ -218,7 +239,7 @@ class ChatController extends APIController
      */
     public function show(Chat $chat)
     {
-            $chatHistory = ChatHistory::query()->where('chat_id' , $chat->id)->get();
+        $chatHistory = ChatHistory::query()->where('chat_id', $chat->id)->get();
         return $this->successResponse($chatHistory);
     }
 
