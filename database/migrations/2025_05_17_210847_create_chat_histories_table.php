@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('chat_histories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('chat_id')->constrained('chats','chat_id')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users','id')->onDelete('cascade');
+            $table->foreignId('chat_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->text('message');
             $table->string('role');
             $table->string('src')->nullable();

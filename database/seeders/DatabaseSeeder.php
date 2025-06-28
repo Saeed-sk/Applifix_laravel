@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@gmail.com',
             'role' => 'admin',
         ]);
-
-        TopicFactory::new()->count(10)->create();
+//
+//        TopicFactory::new()->count(10)->create();
     }
 }

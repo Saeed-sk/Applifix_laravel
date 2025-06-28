@@ -6,8 +6,12 @@
     },
     "disks": [
         {
+            "name": "storage",
+            "mountTo": "storage"
+        },
+        {
             "name": "my-disck",
-            "mountTo": "path/to/folder"
+            "mountTo": "public"
         }
     ]
 }
