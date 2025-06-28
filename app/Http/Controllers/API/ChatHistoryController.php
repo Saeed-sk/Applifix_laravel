@@ -183,4 +183,5 @@ class ChatHistoryController extends APIController
         $chatHistory->delete();
         return $this->successResponse(null, 'Chat history entry deleted');
     }
+
 }

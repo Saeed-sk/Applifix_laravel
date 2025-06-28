@@ -270,4 +270,22 @@ class ChatController extends APIController
         $chat->delete();
         return $this->successResponse('Chat deleted successfully.');
     }
+
+    public function searchQuery(Request $request)
+    {
+        $query = $request->input('query');
+        $history = Chat::query()
+            ->where('user_id', Auth::id())
+            ->where(function ($q) use ($query) {
+                $q->where('title', 'like', '%' . $query . '%')
+                    ->orWhereHas('history', function ($q2) use ($query) {
+                        $q2->where('title', 'like', '%' . $query . '%');
+                    });
+            })
+            ->with('history')
+            ->latest()
+            ->get();
+
+        return $this->successResponse($history);
+    }
 }

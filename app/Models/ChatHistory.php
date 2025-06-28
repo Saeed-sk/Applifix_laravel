@@ -10,7 +10,8 @@ class ChatHistory extends Model
 {
     /** @use HasFactory<\Database\Factories\ChatHistoryFactory> */
     use HasFactory;
-    protected $guarded = 'id';
+
+    protected $guarded = ['id'];
     protected $fillable = [
         'id',
         'chat_id',

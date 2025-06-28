@@ -21,8 +21,8 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::get('/chat/{chat}', [\App\Http\Controllers\API\ChatController::class, 'show']);
-    Route::post('/chat/delete/{chat}',[\App\Http\Controllers\API\ChatController::class, 'delete']);
-    Route::post('/chat/{topic_id}', [\App\Http\Controllers\API\ChatController::class, 'store']);
+    Route::post('/chat/delete/{chat}',[\App\Http\Controllers\API\ChatController::class, 'destroy']);
+    Route::get('/chats/search', [\App\Http\Controllers\API\ChatController::class, 'searchQuery']);
     Route::get('/chat',[\App\Http\Controllers\API\ChatController::class, 'index']);
 });
 
