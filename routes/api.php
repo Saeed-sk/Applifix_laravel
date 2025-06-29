@@ -32,9 +32,10 @@ Route::middleware('auth:api')->group(function () {
 
 Route::get('/topics', [\App\Http\Controllers\API\TopicController::class, 'index']);
 Route::middleware([\App\Http\Middleware\LimitGuestApiWithDB::class])->group(function () {
-    Route::post('/chat', [\App\Http\Controllers\API\ChatController::class, 'create']);
-    Route::post('/new/chat/topic', [\App\Http\Controllers\API\ChatController::class, 'createWithTopic']);
+
 });
+Route::post('/chat', [\App\Http\Controllers\API\ChatController::class, 'create']);
+Route::post('/new/chat/topic', [\App\Http\Controllers\API\ChatController::class, 'createWithTopic']);
 
 // Admin routes
 Route::middleware(['auth:api', 'admin'])->prefix('admin')->group(function () {
